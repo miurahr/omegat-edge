@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -47,7 +48,9 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.omegat.core.data.EntryKey;
 import org.omegat.core.data.ITMXEntry;
+import org.omegat.core.data.TMXEntry;
 
 /**
  * Helper for write TMX files, using StAX.
@@ -160,6 +163,24 @@ public class TMXWriter2 implements AutoCloseable {
     public void writeEntries(final Map<String, ? extends ITMXEntry> entries) throws Exception {
         for (Map.Entry<String, ? extends ITMXEntry> en : entries.entrySet()) {
             writeEntry(en.getKey(), en.getValue().getTranslationText(), en.getValue(), null);
+        }
+    }
+
+    /**
+     * Write entries with alternative translations.
+     * @param entries Map of EntryKey and TMXEntry to output.
+     */
+    public void writeEntriesAlt(final Map<EntryKey, ? extends TMXEntry> entries) throws Exception {
+        List<String> pa = new ArrayList<>();
+        writeComment(" Alternative translations ");
+        for (Map.Entry<EntryKey, ? extends ITMXEntry> en : entries.entrySet()) {
+            EntryKey k = en.getKey();
+            pa.clear();
+            pa.add("file");
+            pa.add(k.file);
+            pa.add("id");
+            pa.add(k.id);
+            writeEntry(en.getKey().sourceText, en.getValue().getTranslationText(), en.getValue(), pa);
         }
     }
 

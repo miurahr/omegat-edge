@@ -8,6 +8,7 @@
                2012 Aaron Madlon-Kay
                2013 Kyle Katarn, Aaron Madlon-Kay
                2014 Alex Buloichik
+               2018 Enrique Estevez Fernandez
                Home page: http://www.omegat.org/
                Support center: https://omegat.org/support
 
@@ -491,9 +492,18 @@ public final class Main {
         String tmxFile = p.getProjectProperties().getProjectInternal() + "align.tmx";
         ProjectProperties config = p.getProjectProperties();
 
-        try (TMXWriter2 wr = new TMXWriter2(new File(tmxFile), config.getSourceLanguage(), config.getTargetLanguage(),
+        if (config.isSupportDefaultTranslations()) {
+            try (TMXWriter2 wr = new TMXWriter2(new File(tmxFile), config.getSourceLanguage(), config.getTargetLanguage(),
                 config.isSentenceSegmentingEnabled(), false, false)) {
-            wr.writeEntries(p.align(p.getProjectProperties(), new File(dir)));
+                wr.writeEntries(p.align(p.getProjectProperties(), new File(dir)));
+            }
+        } else {
+            // If the project is not configured to propagate the translations,
+            // it generates tmx with multiples translations
+            try (TMXWriter2 wr = new TMXWriter2(new File(tmxFile), config.getSourceLanguage(), config.getTargetLanguage(),
+                    config.isSentenceSegmentingEnabled(), true, false)) {
+                wr.writeEntriesAlt(p.alignAlt(p.getProjectProperties(), new File(dir)));
+            }
         }
         p.closeProject();
         System.out.println(OStrings.getString("CONSOLE_FINISHED"));

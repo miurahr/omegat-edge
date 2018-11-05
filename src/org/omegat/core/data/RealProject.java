@@ -12,6 +12,7 @@
                2014 Aaron Madlon-Kay, Didier Briel
                2015 Aaron Madlon-Kay
                2017-2018 Didier Briel
+               2018 Enrique Estevez Fernandez
                2019 Thomas Cordonnier
                2020 Briac Pilpre
                Home page: http://www.omegat.org/
@@ -62,6 +63,8 @@ import java.util.stream.Collectors;
 
 import org.madlonkay.supertmxmerge.StmProperties;
 import org.madlonkay.supertmxmerge.SuperTmxMerge;
+import org.xml.sax.SAXParseException;
+
 import org.omegat.CLIParameters;
 import org.omegat.core.Core;
 import org.omegat.core.CoreEvents;
@@ -102,7 +105,6 @@ import org.omegat.util.StringUtil;
 import org.omegat.util.TMXReader2;
 import org.omegat.util.TagUtil;
 import org.omegat.util.gui.UIThreadsUtil;
-import org.xml.sax.SAXParseException;
 
 import gen.core.filters.Filters;
 
@@ -461,6 +463,39 @@ public class RealProject implements IProject {
                     alignFilesCallback);
         }
         return alignFilesCallback.data;
+    }
+
+    /**
+     * Alternative Align project.
+     */
+    public Map<EntryKey, TMXEntry> alignAlt(final ProjectProperties props, final File translatedDir)
+            throws Exception {
+        FilterMaster fm = Core.getFilterMaster();
+
+        File root = new File(config.getSourceRoot());
+        List<File> srcFileList = FileUtil.buildFileList(root, true);
+
+        AlignFilesCallback alignFilesCallback = new AlignFilesCallback(props);
+        Map<EntryKey, TMXEntry> auxiliar = new HashMap<EntryKey, TMXEntry>();
+        String srcRoot = config.getSourceRoot();
+        for (File file : srcFileList) {
+            // shorten filename to that which is relative to src root
+            String midName = file.getPath().substring(srcRoot.length());
+            fm.alignFile(srcRoot, midName, translatedDir.getPath(), new FilterContext(props),
+                    alignFilesCallback);
+            // I did not know how modify the entries into the hash (missing filename)
+            // I generate the new the entries, remove the old and add the new
+            for (Map.Entry<EntryKey, ? extends TMXEntry> entry : alignFilesCallback.multiples.entrySet()) {
+                PrepareTMXEntry tr = new PrepareTMXEntry();
+                tr.source = entry.getValue().getSourceText();
+                tr.translation = entry.getValue().getTranslationText();
+                auxiliar.put(new EntryKey(midName, entry.getKey().sourceText, entry.getKey().id, "", "", file.getPath()),
+                        new TMXEntry(tr, false, null));
+            }
+            alignFilesCallback.multiples.clear();
+        }
+        alignFilesCallback.multiples = auxiliar;
+        return alignFilesCallback.multiples;
     }
 
     /**
@@ -1815,6 +1850,7 @@ public class RealProject implements IProject {
         }
 
         Map<String, TMXEntry> data = new TreeMap<>();
+        Map<EntryKey, TMXEntry> multiples = new TreeMap<>();
         private ProjectProperties config;
 
         @Override
@@ -1858,6 +1894,7 @@ public class RealProject implements IProject {
                     tr.source = sourceS;
                     tr.translation = transS;
                     data.put(sourceS, new TMXEntry(tr, true, null));
+                    multiples.put(new EntryKey("", source, id, "", "", ""), new TMXEntry(tr, true, null));
                 }
             }
         }
