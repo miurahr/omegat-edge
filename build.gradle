@@ -165,8 +165,9 @@ dependencies {
         implementation "org.apache.lucene:lucene-analyzers-stempel:${luceneVersion}"
 
         // Team project server support
-        implementation 'org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r'
-        implementation 'org.eclipse.jgit:org.eclipse.jgit.ssh.apache:5.13.0.202109080827-r'
+        implementation 'org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r'
+        implementation 'org.eclipse.jgit:org.eclipse.jgit.ssh.apache:6.1.0.202203080745-r'
+        implementation 'org.eclipse.jgit:org.eclipse.jgit.ssh.apache.agent:6.1.0.202203080745-r'
         implementation 'org.apache.sshd:sshd-git:2.7.0'
         implementation 'org.bouncycastle:bcprov-jdk15on:1.69'
         implementation 'org.bouncycastle:bcpg-jdk15on:1.69'
