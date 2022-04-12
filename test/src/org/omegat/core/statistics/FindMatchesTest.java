@@ -30,6 +30,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -39,6 +40,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.omegat.core.Core;
@@ -46,7 +49,6 @@ import org.omegat.core.data.EntryKey;
 import org.omegat.core.data.ExternalTMFactory;
 import org.omegat.core.data.ExternalTMX;
 import org.omegat.core.data.IProject;
-import org.omegat.core.data.ITMXEntry;
 import org.omegat.core.data.NotLoadedProject;
 import org.omegat.core.data.ProjectProperties;
 import org.omegat.core.data.ProjectTMX;
@@ -66,6 +68,10 @@ import org.omegat.util.TestPreferencesInitializer;
 
 public class FindMatchesTest {
 
+    private static final File file = new File("test/data/tmx/en-US_sr.tmx");
+    private static IProject project;
+    private static Path tmpDir;
+
     /**
      * Reproduce and test for RFE#1578.
      *
@@ -75,13 +81,22 @@ public class FindMatchesTest {
      * and set preference to use other target language,
      * OmegaT show the source of "en-US" as reference.
      *
-     * @throws Exception when error occurred.
      */
     @Test
-    public void testSearchRFE1578() throws Exception {
+    public void testSearchRFE1578() {
+        IStopped iStopped = () -> false;
+        FindMatches finder = new FindMatches(project, OConsts.MAX_NEAR_STRINGS, true, false);
+        List<NearString> result = finder.search("XXX", true, true, iStopped);
+        // Without the fix, the result has two entries, but it should one.
+        assertEquals(1, result.size());
+        assertEquals("XXX", result.get(0).source);
+        assertEquals("YYY", result.get(0).translation);
+    }
+
+    @BeforeClass
+    public static void setUp() throws Exception {
         ProjectProperties prop;
-        File file = new File("test/data/tmx/en-US_sr.tmx");
-        Path tmpDir = Files.createTempDirectory("omegat");
+        tmpDir = Files.createTempDirectory("omegat");
         assertTrue(tmpDir.toFile().isDirectory());
         Core.initializeConsole(new TreeMap<>());
         TestPreferencesInitializer.init();
@@ -95,7 +110,7 @@ public class FindMatchesTest {
         prop.setTargetLanguage("cnr");
         prop.setSupportDefaultTranslations(true);
         prop.setSentenceSegmentingEnabled(false);
-        IProject project = new NotLoadedProject() {
+        project = new NotLoadedProject() {
             @Override
             public ProjectProperties getProjectProperties() {
                 return prop;
@@ -122,26 +137,13 @@ public class FindMatchesTest {
             @Override
             public Map<Language, ProjectTMX> getOtherTargetLanguageTMs() {
                 return Collections.emptyMap();
-           }
+            }
 
             @Override
             public Map<String, ExternalTMX> getTransMemories() {
                 Map<String, ExternalTMX> transMemories = new TreeMap<>();
                 try {
                     ExternalTMX newTMX = ExternalTMFactory.load(file);
-                    // newTMX will have two entries:
-                    // - #0:
-                    // source XXX
-                    // translation XXX  lang = en-US
-                    // - #1
-                    // source XXX
-                    // translation YYY  lang = sr
-                    ITMXEntry en = newTMX.getEntries().get(0);
-                    assertEquals("XXX", en.getSourceText());
-                    assertEquals("XXX", en.getTranslationText());
-                    en = newTMX.getEntries().get(1);
-                    assertEquals("XXX", en.getSourceText());
-                    assertEquals("YYY", en.getTranslationText());
                     transMemories.put(file.getPath(), newTMX);
                 } catch (Exception ignored) {
                 }
@@ -150,12 +152,10 @@ public class FindMatchesTest {
         };
         Core.setProject(project);
         Core.setSegmenter(new Segmenter(new SRX()));
-        IStopped iStopped = () -> false;
-        FindMatches finder = new FindMatches(project, OConsts.MAX_NEAR_STRINGS, true, false);
-        List<NearString> result = finder.search("XXX", true, true, iStopped);
-        // Without the fix, the result has two entries, but it should one.
-        assertEquals(1, result.size());
-        assertEquals("YYY", result.get(0).translation);
+    }
+
+    @AfterClass
+    public static void tearDown() throws IOException {
         FileUtils.deleteDirectory(tmpDir.toFile());
         assertFalse(tmpDir.toFile().exists());
     }
