@@ -233,15 +233,8 @@ public class FindMatches {
                     // Not all TMX entries have a source; in that case there can be no meaningful match, so skip.
                     continue;
                 }
-                if (requiresTranslation) {
-                    if (tmen.getTranslationText() == null) {
-                        continue;
-                    }
-                    String sourceLang = tmen.getPropValue(ExternalTMFactory.TMXLoader.PROP_TARGET_LANGUAGE);
-                    String targetLang = tmen.getPropValue(ExternalTMFactory.TMXLoader.PROP_SOURCE_LANGUAGE);
-                    if (sourceLang.equals(targetLang)) {
-                        continue;
-                    }
+                if (requiresTranslation && tmen.getTranslationText() == null) {
+                    continue;
                 }
 
                 int tmenPenalty = penalty;
