@@ -41,6 +41,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -68,8 +69,8 @@ import org.omegat.util.TestPreferencesInitializer;
 
 public class FindMatchesTest {
 
-    private static final File file = new File("test/data/tmx/en-US_sr.tmx");
-    private static IProject project;
+    private static final File TMX_EN_US_SR = new File("test/data/tmx/en-US_sr.tmx");
+    private static final File TMX_EN_US_GB_SR = new File("test/data/tmx/en-US_en-GB_fr_sr.tmx");
     private static Path tmpDir;
 
     /**
@@ -83,7 +84,15 @@ public class FindMatchesTest {
      *
      */
     @Test
-    public void testSearchRFE1578() {
+    public void testSearchRFE1578() throws Exception {
+        ProjectProperties prop = new ProjectProperties(tmpDir.toFile());
+        prop.setSourceLanguage("en");
+        prop.setTargetLanguage("cnr");
+        prop.setSupportDefaultTranslations(true);
+        prop.setSentenceSegmentingEnabled(false);
+        IProject project = new TestProject(prop, TMX_EN_US_SR);
+        Core.setProject(project);
+        Core.setSegmenter(new Segmenter(new SRX()));
         IStopped iStopped = () -> false;
         FindMatches finder = new FindMatches(project, OConsts.MAX_NEAR_STRINGS, true, false);
         List<NearString> result = finder.search("XXX", true, true, iStopped);
@@ -93,11 +102,34 @@ public class FindMatchesTest {
         assertEquals("YYY", result.get(0).translation);
     }
 
+    @Test
+    public void testSearchRFE1578_2() throws Exception {
+        ProjectProperties prop = new ProjectProperties(tmpDir.toFile());
+        prop.setSourceLanguage("en");
+        prop.setTargetLanguage("cnr");
+        prop.setSupportDefaultTranslations(true);
+        prop.setSentenceSegmentingEnabled(false);
+        IProject project = new TestProject(prop, TMX_EN_US_GB_SR);
+        Core.setProject(project);
+        Core.setSegmenter(new Segmenter(new SRX()));
+        IStopped iStopped = () -> false;
+        FindMatches finder = new FindMatches(project, OConsts.MAX_NEAR_STRINGS, true, false);
+        List<NearString> result = finder.search("XXX", true, true, iStopped);
+        // Without the fix, the result has two entries, but it should one.
+        assertEquals(2, result.size());
+        assertEquals("XXX", result.get(0).source);  // en-US, because header's srclang=en-US
+        assertEquals("YYY", result.get(0).translation); // fr
+        assertEquals("ZZZ", result.get(1).translation); // sr
+    }
+
     @BeforeClass
-    public static void setUp() throws Exception {
-        ProjectProperties prop;
+    public static void setUpClass() throws Exception {
         tmpDir = Files.createTempDirectory("omegat");
         assertTrue(tmpDir.toFile().isDirectory());
+    }
+
+    @Before
+    public void setUp() throws Exception {
         Core.initializeConsole(new TreeMap<>());
         TestPreferencesInitializer.init();
         Preferences.setPreference(Preferences.EXT_TMX_SHOW_LEVEL2, false);
@@ -105,53 +137,55 @@ public class FindMatchesTest {
         Preferences.setPreference(Preferences.EXT_TMX_KEEP_FOREIGN_MATCH, true);
         Core.registerTokenizerClass(DefaultTokenizer.class);
         Core.registerTokenizerClass(LuceneEnglishTokenizer.class);
-        prop = new ProjectProperties(tmpDir.toFile());
-        prop.setSourceLanguage("en");
-        prop.setTargetLanguage("cnr");
-        prop.setSupportDefaultTranslations(true);
-        prop.setSentenceSegmentingEnabled(false);
-        project = new NotLoadedProject() {
-            @Override
-            public ProjectProperties getProjectProperties() {
-                return prop;
-            }
+    }
 
-            @Override
-            public List<SourceTextEntry> getAllEntries() {
-                List<SourceTextEntry> ste = new ArrayList<>();
-                ste.add(new SourceTextEntry(new EntryKey("source.txt", "XXX", null, "", "", null),
-                        1, null, null, new ArrayList<>()));
-                return ste;
-            }
+    static class TestProject extends NotLoadedProject implements IProject {
+        private ProjectProperties prop;
+        private File testTmx;
 
-            @Override
-            public ITokenizer getSourceTokenizer() {
-                return new LuceneEnglishTokenizer();
-            };
+        public TestProject(final ProjectProperties prop, final File testTmx) {
+            this.prop = prop;
+            this.testTmx = testTmx;
+        }
 
-            @Override
-            public ITokenizer getTargetTokenizer() {
-                return new DefaultTokenizer();
-            }
+        @Override
+        public ProjectProperties getProjectProperties() {
+            return prop;
+        }
 
-            @Override
-            public Map<Language, ProjectTMX> getOtherTargetLanguageTMs() {
-                return Collections.emptyMap();
-            }
+        @Override
+        public List<SourceTextEntry> getAllEntries() {
+            List<SourceTextEntry> ste = new ArrayList<>();
+            ste.add(new SourceTextEntry(new EntryKey("source.txt", "XXX", null, "", "", null),
+                    1, null, null, new ArrayList<>()));
+            return ste;
+        }
 
-            @Override
-            public Map<String, ExternalTMX> getTransMemories() {
-                Map<String, ExternalTMX> transMemories = new TreeMap<>();
-                try {
-                    ExternalTMX newTMX = ExternalTMFactory.load(file);
-                    transMemories.put(file.getPath(), newTMX);
-                } catch (Exception ignored) {
-                }
-                return Collections.unmodifiableMap(transMemories);
-            }
+        @Override
+        public ITokenizer getSourceTokenizer() {
+            return new LuceneEnglishTokenizer();
         };
-        Core.setProject(project);
-        Core.setSegmenter(new Segmenter(new SRX()));
+
+        @Override
+        public ITokenizer getTargetTokenizer() {
+            return new DefaultTokenizer();
+        }
+
+        @Override
+        public Map<Language, ProjectTMX> getOtherTargetLanguageTMs() {
+            return Collections.emptyMap();
+        }
+
+        @Override
+        public Map<String, ExternalTMX> getTransMemories() {
+            Map<String, ExternalTMX> transMemories = new TreeMap<>();
+            try {
+                ExternalTMX newTMX = ExternalTMFactory.load(testTmx);
+                transMemories.put(testTmx.getPath(), newTMX);
+            } catch (Exception ignored) {
+            }
+            return Collections.unmodifiableMap(transMemories);
+        }
     }
 
     @AfterClass
