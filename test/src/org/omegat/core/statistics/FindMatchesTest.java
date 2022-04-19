@@ -116,10 +116,11 @@ public class FindMatchesTest {
         FindMatches finder = new FindMatches(project, OConsts.MAX_NEAR_STRINGS, true, false);
         List<NearString> result = finder.search("XXX", true, true, iStopped);
         // Without the fix, the result has two entries, but it should one.
-        assertEquals(2, result.size());
-        assertEquals("XXX", result.get(0).source);  // en-US, because header's srclang=en-US
-        assertEquals("YYY", result.get(0).translation); // fr
-        assertEquals("ZZZ", result.get(1).translation); // sr
+        assertEquals("XXx", result.get(0).source);  // en-US, because header's srclang=en-US
+        assertEquals("XXX", result.get(0).translation); // en-GB
+        assertEquals("YYY", result.get(1).translation); // fr
+        assertEquals("ZZZ", result.get(2).translation); // sr
+        assertEquals(3, result.size());
     }
 
     @BeforeClass
