@@ -292,6 +292,7 @@ public class PoFilter extends AbstractFilter {
     private int plurals = 2;
     private String path;
     private boolean nowrap, fuzzy, fuzzyTrue;
+    private boolean headerProcessed;
 
     private BufferedWriter out;
 
@@ -360,9 +361,9 @@ public class PoFilter extends AbstractFilter {
         String disallowBlankStr = processOptions.get(OPTION_ALLOW_BLANK);
         allowBlank = disallowBlankStr == null || disallowBlankStr.equalsIgnoreCase("true");
 
-        String disallowEditingBlankSegmentStr = processOptions.get(OPTION_ALLOW_EDITING_BLANK_SEGMENT);
-        allowEditingBlankSegment = disallowEditingBlankSegmentStr == null
-                || disallowEditingBlankSegmentStr.equalsIgnoreCase("true");
+        String allowEditingBlankSegmentStr = processOptions.get(OPTION_ALLOW_EDITING_BLANK_SEGMENT);
+        allowEditingBlankSegment = allowEditingBlankSegmentStr == null
+                || allowEditingBlankSegmentStr.equalsIgnoreCase("true");
 
         String skipHeaderStr = processOptions.get(OPTION_SKIP_HEADER);
         skipHeader = "true".equalsIgnoreCase(skipHeaderStr);
@@ -396,6 +397,7 @@ public class PoFilter extends AbstractFilter {
         nowrap = false;
         MODE currentMode = null;
         int currentPlural = 0;
+        headerProcessed = false;
 
         sources = new StringBuilder[2];
         sources[0] = new StringBuilder();
@@ -484,7 +486,7 @@ public class PoFilter extends AbstractFilter {
                 // Hack to be able to translate empty segments
                 // If the source segment is empty and there is a reference then
                 // it copies the reference of the segment and the localization note into the source segment
-                if (allowEditingBlankSegment && sources[0].length() == 0 && references.length() > 0) {
+                if (allowEditingBlankSegment && sources[0].length() == 0 && references.length() > 0 && headerProcessed) {
                     String aux = references + extractedComments.toString();
                     sources[0].append(aux);
                 }
@@ -672,6 +674,7 @@ public class PoFilter extends AbstractFilter {
 
     protected void flushTranslation(MODE currentMode, FilterContext fc) throws IOException {
         if (sources[0].length() == 0 && path.isEmpty()) {
+            headerProcessed = true;
             if (targets[0].length() == 0) {
                 // there is no text to translate yet
                 return;
