@@ -1,5 +1,16 @@
-﻿@TRANSLATION_NOTICE@
+﻿What is OmegaT-Edge?
+====================
 
+OmegaT-Edge is experimental and unofficial OmegaT development edition
+with cutting-edge features.
+All the improved features are merged from omegat project proposals.
+
+Notable differences are as follows:
+
+* Product name is "OmegaT-Edge"
+* Minimum Java version is 11
+* Team/Git feature is based on JGit 6.1.0 and Apache MINA SSHD 2.7.0
+* Plugin can be installed from Preference GUI dialog.
 
 What is OmegaT?
 ===============
