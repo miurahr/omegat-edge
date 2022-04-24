@@ -48,7 +48,7 @@ public final class OStrings {
     }
 
     /** For custom deployments of OmegaT that need to be distinguishable from "stock" OmegaT */
-    public static final String BRANDING = "";
+    public static final String BRANDING = "(Edge edition)";
 
     /** Just a version, e.g. "1.6" */
     public static final String VERSION;
