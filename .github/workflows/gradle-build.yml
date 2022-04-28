@@ -20,6 +20,7 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '11'
+    - uses: kiancross/checkstyle-annotations-action@v1
     - uses: gradle/gradle-build-action@v2
       name: Gradle check
       with:
