@@ -1,6 +1,15 @@
 name: Run Gradle test
 
-on: push
+on:
+  push:
+    branches:
+      - main
+      - releases/*
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 jobs:
   gradle:
