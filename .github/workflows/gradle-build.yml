@@ -1,6 +1,15 @@
 name: Run Gradle test
 
-on: push
+on:
+  push:
+    branches:
+      - main
+      - releases/*
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 jobs:
   gradle:
@@ -11,6 +20,7 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '11'
+    - uses: kiancross/checkstyle-annotations-action@v1
     - uses: gradle/gradle-build-action@v2
       name: Gradle check
       with:
