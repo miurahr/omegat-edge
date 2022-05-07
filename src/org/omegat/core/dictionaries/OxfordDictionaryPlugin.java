@@ -1,7 +1,11 @@
 /**************************************************************************
-Oxford dictionary API plugin for OmegaT CAT tool(http://www.omegat.org/)
+ Oxford dictionary API plugin for
+ OmegaT - Computer Assisted Translation (CAT) tool
+ Home page: http://www.omegat.org/
 
- Copyright (C) 2020,2021 Hiroshi Miura
+ Copyright (C) 2020-2022 Hiroshi Miura
+
+ This file is part of OmegaT.
 
  OmegaT is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by

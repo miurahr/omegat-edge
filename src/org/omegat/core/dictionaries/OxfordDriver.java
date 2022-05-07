@@ -1,6 +1,27 @@
+/**************************************************************************
+ Oxford dictionary API plugin for
+ OmegaT - Computer Assisted Translation (CAT) tool
+          Home page: http://www.omegat.org/
+
+ Copyright (C) 2020-2022 Hiroshi Miura
+
+ This file is part of OmegaT.
+
+ OmegaT is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ OmegaT is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ **************************************************************************/
 package org.omegat.core.dictionaries;
 
-import org.omegat.gui.preferences.view.OxfordPreferencesController;
 import org.omegat.util.Language;
 import org.omegat.util.Log;
 import org.omegat.util.Preferences;
@@ -20,6 +41,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static org.omegat.gui.preferences.view.OxfordPreferencesController.getAppId;
+import static org.omegat.gui.preferences.view.OxfordPreferencesController.getAppKey;
+import static org.omegat.gui.preferences.view.OxfordPreferencesController.isBilingual;
+import static org.omegat.gui.preferences.view.OxfordPreferencesController.isMonolingual;
+
 public class OxfordDriver implements IDictionary {
 
     private final Language source;
@@ -29,8 +55,7 @@ public class OxfordDriver implements IDictionary {
     public OxfordDriver(final Language source, final Language target) {
         this.source = source;
         this.target = target;
-        searcher = new OxfordThreadClient(OxfordPreferencesController.getAppId(),
-                OxfordPreferencesController.getAppKey());
+        searcher = new OxfordThreadClient(getAppId(), getAppKey());
     }
 
     /**
@@ -68,7 +93,7 @@ public class OxfordDriver implements IDictionary {
 
     private List<DictionaryEntry> queryArticles(final Collection<String> words, final boolean strict) {
         List<DictionaryEntry> dictionaryEntries = new ArrayList<>();
-        if (OxfordPreferencesController.isMonolingual()) {
+        if (isMonolingual()) {
             try {
                 searcher.queryEntries(words, source.getLanguageCode(), strict).forEach((key, value) -> {
                     for (Result result : value) {
@@ -84,7 +109,7 @@ public class OxfordDriver implements IDictionary {
                 Log.log(e);
             }
         }
-        if (OxfordPreferencesController.isBilingual()) {
+        if (isBilingual()) {
             try {
                 for (OxfordDictionaryEntry en : searcher.getTranslations(words,
                         source.getLanguageCode(), target.getLanguageCode())) {
@@ -172,5 +197,4 @@ public class OxfordDriver implements IDictionary {
         }
         return sb.toString();
     }
-
 }
