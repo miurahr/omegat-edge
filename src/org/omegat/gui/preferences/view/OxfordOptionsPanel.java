@@ -31,6 +31,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -80,12 +82,55 @@ public class OxfordOptionsPanel extends JPanel {
     }
 
     private void initGui() {
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        JPanel cbPanel = new JPanel();
-        JPanel idPanel = new JPanel();
-        JPanel keyPanel = new JPanel();
-        JPanel queryPanel = new JPanel();
+        setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
         enableOption = new JCheckBox("Enable Oxford Dictionaries");
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.ipady = 20;
+        add(enableOption, c);
+        //
+        JLabel appIdLabel = new JLabel();
+        appIdLabel.setText("OD API App ID : ");
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 1;
+        c.ipady = 0;
+        add(appIdLabel, c);
+        //
+        appIdField = new JTextField();
+        appIdField.setPreferredSize(new Dimension(300, 30));
+        appIdField.setHorizontalAlignment(JTextField.LEFT);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 1;
+        c.gridy = 1;
+        add(appIdField, c);
+        //
+        JLabel appKeyLabel = new JLabel();
+        appKeyLabel.setText("OD API AppKey : ");
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 2;
+        add(appKeyLabel, c);
+        //
+        appKeyField = new JTextField();
+        appKeyField.setPreferredSize(new Dimension(300, 30));
+        appKeyField.setHorizontalAlignment(JTextField.LEFT);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 1;
+        c.gridy = 2;
+        add(appKeyField, c);
+        //
+        JLabel queryTitle = new JLabel();
+        queryTitle.setText("Query mode");
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 3;
+        add(queryTitle, c);
+        //
+        JPanel queryPanel = new JPanel();
+        queryPanel.setLayout(new BoxLayout(queryPanel, BoxLayout.PAGE_AXIS));
         queryMonolingual = new JRadioButton("Query monolingual dictionary");
         queryBilingual = new JRadioButton("Query bilingual dictionary");
         queryBoth = new JRadioButton("Query both mono/bi-ligual dictionary");
@@ -93,32 +138,13 @@ public class OxfordOptionsPanel extends JPanel {
         buttonGroup.add(queryMonolingual);
         buttonGroup.add(queryBilingual);
         buttonGroup.add(queryBoth);
-        appIdField = new JTextField();
-        appKeyField = new JTextField();
-        appIdField.setPreferredSize(new Dimension(300, 30));
-        appKeyField.setPreferredSize(new Dimension(300, 30));
-        appIdField.setHorizontalAlignment(JTextField.LEFT);
-        appKeyField.setHorizontalAlignment(JTextField.LEFT);
-        JLabel appIdLabel = new JLabel();
-        JLabel appKeyLabel = new JLabel();
-        appIdLabel.setText("OD API App ID : ");
-        appKeyLabel.setText("OD API AppKey : ");
-        cbPanel.add(enableOption);
-        cbPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-        idPanel.add(appIdLabel);
-        idPanel.add(appIdField);
-        idPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-        keyPanel.add(appKeyLabel);
-        keyPanel.add(appKeyField);
-        keyPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-        queryPanel.setLayout(new BoxLayout(queryPanel, BoxLayout.PAGE_AXIS));
         queryPanel.add(queryMonolingual);
         queryPanel.add(queryBilingual);
         queryPanel.add(queryBoth);
         queryPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-        add(cbPanel);
-        add(idPanel);
-        add(keyPanel);
-        add(queryPanel);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 1;
+        c.gridy = 3;
+        add(queryPanel, c);
     }
 }
