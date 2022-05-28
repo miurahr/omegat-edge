@@ -23,6 +23,7 @@ Changed
 - Test: use ThreadLocalRandom for temporary filename
 - Change branding to Edge edition
 - AbstractFilter,PoFilter,MozillaLangFilter: Refactoring createWriter createReader
+- Topic/jc/pixel logos
 
 Fixed
 -----
