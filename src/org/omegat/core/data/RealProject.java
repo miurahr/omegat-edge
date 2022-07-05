@@ -476,7 +476,7 @@ public class RealProject implements IProject {
         List<File> srcFileList = FileUtil.buildFileList(root, true);
 
         AlignFilesCallback alignFilesCallback = new AlignFilesCallback(props);
-        Map<EntryKey, TMXEntry> auxiliar = new HashMap<EntryKey, TMXEntry>();
+        Map<EntryKey, TMXEntry> auxiliar = new HashMap<>();
         String srcRoot = config.getSourceRoot();
         for (File file : srcFileList) {
             // shorten filename to that which is relative to src root
@@ -485,7 +485,7 @@ public class RealProject implements IProject {
                     alignFilesCallback);
             // I did not know how modify the entries into the hash (missing filename)
             // I generate the new the entries, remove the old and add the new
-            for (Map.Entry<EntryKey, ? extends TMXEntry> entry : alignFilesCallback.multiples.entrySet()) {
+            for (Map.Entry<EntryKey, ? extends ITMXEntry> entry : alignFilesCallback.multiples.entrySet()) {
                 PrepareTMXEntry tr = new PrepareTMXEntry();
                 tr.source = entry.getValue().getSourceText();
                 tr.translation = entry.getValue().getTranslationText();

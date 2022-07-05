@@ -50,7 +50,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.omegat.core.data.EntryKey;
 import org.omegat.core.data.ITMXEntry;
-import org.omegat.core.data.TMXEntry;
 
 /**
  * Helper for write TMX files, using StAX.
@@ -170,7 +169,7 @@ public class TMXWriter2 implements AutoCloseable {
      * Write entries with alternative translations.
      * @param entries Map of EntryKey and TMXEntry to output.
      */
-    public void writeEntriesAlt(final Map<EntryKey, ? extends TMXEntry> entries) throws Exception {
+    public void writeEntriesAlt(final Map<EntryKey, ? extends ITMXEntry> entries) throws Exception {
         List<String> pa = new ArrayList<>();
         writeComment(" Alternative translations ");
         for (Map.Entry<EntryKey, ? extends ITMXEntry> en : entries.entrySet()) {
