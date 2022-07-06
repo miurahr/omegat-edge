@@ -20,13 +20,11 @@ jobs:
     - uses: gradle/gradle-build-action@v2
       with:
         arguments: assembleDist
-    - name: Create release
-      uses: "marvinpinto/action-automatic-releases@latest"
-      id: create_release
+    - name: Update continuous build
+      uses: svenstaro/upload-release-action@v2
       with:
-        title: Continuous release
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        draft: false
-        prerelease: false
-        files: |
-          build/distributions/*.zip
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        overwrite: true
+        prerelease: true
+        tag: Continuous
+        file: build/distributions/OmegaT_*_Beta_Without_JRE.zip
