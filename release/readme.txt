@@ -11,6 +11,9 @@ Notable differences are as follows:
 * Minimum Java version is 11
 * Team/Git feature is based on JGit 6.1.0 and Apache MINA SSHD 2.7.0
 * Plugin can be installed from Preference GUI dialog.
+* Support OxFord online dictionary
+* You can use team feature with arbitarary branch name on git repository 
+
 
 What is OmegaT?
 ===============
