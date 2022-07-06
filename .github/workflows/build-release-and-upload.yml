@@ -27,4 +27,4 @@ jobs:
         overwrite: true
         prerelease: true
         tag: Continuous
-        file: build/distributions/OmegaT_*_Beta_Without_JRE.zip
+        file: build/distributions/OmegaT-edge_Without_JRE.zip

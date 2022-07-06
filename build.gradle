@@ -18,7 +18,7 @@ plugins {
 
 apply from: 'gradle/utils.gradle'
 
-applicationName = 'OmegaT'
+applicationName = 'OmegaT-edge'
 mainClassName = 'org.omegat.Main'
 
 ext {
@@ -350,7 +350,7 @@ distributions {
                 }
             }
         }
-        distZip.archiveFileName = "${applicationName}_${version}${omtVersion.beta}_Without_JRE.zip"
+        distZip.archiveFileName = "${applicationName}_Without_JRE.zip"
     }
 
     source {
@@ -365,7 +365,7 @@ distributions {
                 from configurations.runtimeClasspath
             }
         }
-        sourceDistZip.archiveFileName = "${applicationName}_${version}${omtVersion.beta}_Source.zip"
+        sourceDistZip.archiveFileName = "${applicationName}_Source.zip"
     }
 
     mac {
