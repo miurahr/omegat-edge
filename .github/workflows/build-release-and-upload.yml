@@ -1,0 +1,32 @@
+name: Build and release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+    - uses: kiancross/checkstyle-annotations-action@v1
+    - uses: gradle/gradle-build-action@v2
+      with:
+        arguments: assembleDist
+    - name: Create release
+      uses: "marvinpinto/action-automatic-releases@latest"
+      id: create_release
+      with:
+        title: Continuous release
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        draft: false
+        prerelease: false
+        files: |
+          build/distributions/*.zip
